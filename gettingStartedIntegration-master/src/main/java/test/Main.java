@@ -1,5 +1,7 @@
 package test;
 
+import controller.AppController;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
@@ -16,7 +18,8 @@ public class Main {
 
 		//ApplicationContext ctx = new ClassPathXmlApplicationContext("routing.xml");
 
-		ApplicationContext ctx = new ClassPathXmlApplicationContext("aggragate.xml");
+		SpringApplication.run(AppController.class, args);
+		//ApplicationContext ctx = new ClassPathXmlApplicationContext("aggragate.xml");
 
 		/*
 		ApplicationContext ctx = new ClassPathXmlApplicationContext("javaScriptService.xml");
