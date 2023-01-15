@@ -10,38 +10,60 @@
            http://www.springframework.org/schema/integration/file
            http://www.springframework.org/schema/integration/file/spring-integration-file-5.1.xsd">
 
-    <int-file:inbound-channel-adapter 
-		channel="channelEntree" 
-    	directory="C:\Users\rochm\Desktop\Semestre 9\Cloud Integration\Project\CloudIntegration\gettingStartedIntegration-master\dataIn"
-    	filename-pattern="account.json">
-    		<int:poller id="poller" fixed-delay="1000" />
+
+    <int-file:inbound-channel-adapter
+            channel="channelEntree"
+            directory="C:\Users\rochm\Desktop\Semestre 9\Cloud Integration\Project\CloudIntegration\gettingStartedIntegration-master\dataIn"
+            filename-pattern="*.json">
+        <int:poller id="poller" fixed-delay="1000" />
     </int-file:inbound-channel-adapter>
-    
+
+
+    <int:channel id="channelEntree"></int:channel>
+
+
     <int:json-to-object-transformer input-channel="channelEntree" output-channel="mainChannel" type="test.MyAccount"></int:json-to-object-transformer>
 
+
     <int:channel id="mainChannel"></int:channel>
-    
+
+
     <int:recipient-list-router id="customRouter" input-channel="mainChannel">
-  		<int:recipient channel="serviceActivatorChannel"/>
-  		<int:recipient channel="aggregatorChannel"/>
-	</int:recipient-list-router>
-    
-    <int:service-activator input-channel="serviceActivatorChannel" output-channel="aggregatorChannel" ref="serviceID" method="myService"/>
+        <int:recipient channel="serviceActivatorChannel"/>
+        <int:recipient channel="aggregatorChannel"/>
+    </int:recipient-list-router>
+
+
+    <int:service-activator input-channel="serviceActivatorChannel" output-channel="aggregatorChannel" ref="serviceID" method="saveAccount"/>
+
+
     <bean id="serviceID" class="test.AccountService"/>
-    
+
+
     <int:channel id="aggregatorChannel"></int:channel>
 
-    <int:aggregator id="myAggregator"
-                    input-channel="aggregatorChannel"
-                    output-channel="outputChannel"
-                    correlation-strategy-expression="payload.name"
-                    release-strategy-expression="size()==2">
-    </int:aggregator>
+
+    <int:object-to-json-transformer
+            input-channel="aggregatorChannel"
+            output-channel="outputChannel"></int:object-to-json-transformer>
+
+
+    <int-file:outbound-channel-adapter
+            id="fileOutboundAdapter"
+            channel="outputChannel"
+            directory="C:\Users\rochm\Desktop\Semestre 9\Cloud Integration\Project\CloudIntegration\gettingStartedIntegration-master\dataIn"
+            auto-create-directory="true"
+            filename-generator="JsonFileGenerator">
+    </int-file:outbound-channel-adapter>
+
+
+    <bean id="JsonFileGenerator" class="test.JsonFileGenerator"/>
+
 
     <int:channel id="outputChannel"></int:channel>
 
+
     <int:logging-channel-adapter channel="outputChannel" level="INFO"/>
 
-    
 </beans>
-    
+
